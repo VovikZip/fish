@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miracle Garden Booking</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Подключение библиотеки intl-tel-input для флагов и кодов стран -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+</head>
+<body>
+    <!-- Первая форма с выбором билетов -->
+    <div class="ticket-form" id="ticketForm">
+        <h1>Miracle Garden, Open Dated Tickets</h1>
+        <div class="form-content">
+            <div class="availability">
+                <h2>Check Availability</h2>
+                <div class="ticket-row">
+                    <span class="ticket-label">Adult (12 and above)</span>
+                    <span class="ticket-price">100 AED</span>
+                    <div class="counter">
+                        <button onclick="updateCount('adult', -1)">-</button>
+                        <input type="text" id="adult-count" value="1" readonly>
+                        <button onclick="updateCount('adult', 1)">+</button>
+                    </div>
+                    <span class="price" id="adult-total">100 AED</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="ticket-label">Children (3 to 11)</span>
+                    <span class="ticket-price">85 AED</span>
+                    <div class="counter">
+                        <button onclick="updateCount('child', -1)">-</button>
+                        <input type="text" id="child-count" value="0" readonly>
+                        <button onclick="updateCount('child', 1)">+</button>
+                    </div>
+                    <span class="price" id="child-total">0 AED</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="ticket-label">Infant (2 and below)</span>
+                    <span class="ticket-price">Free</span>
+                    <div class="counter">
+                        <button onclick="updateCount('infant', -1)">-</button>
+                        <input type="text" id="infant-count" value="0" readonly>
+                        <button onclick="updateCount('infant', 1)">+</button>
+                    </div>
+                    <span class="price" id="infant-total">0 AED</span>
+                </div>
+                <div class="total-row">
+                    <span>Total</span>
+                    <span class="total-price" id="total-amount">100 AED</span>
+                </div>
+            </div>
+        </div>
+        <button class="checkout-button" onclick="showBookingForm()">Proceed to Checkout</button>
+    </div>
+
+    <!-- Вторая форма для бронирования и оплаты -->
+    <div class="booking-form" id="bookingForm" style="display: none;">
+        <h1>Guest Details</h1>
+        <div class="guest-details">
+            <input type="text" id="name" placeholder="Enter Your Name *" required>
+            <input type="email" id="email" placeholder="Enter Your Email *" required>
+            <div class="phone-input">
+                <input type="tel" id="phone" placeholder="Phone Number" required>
+            </div>
+        </div>
+        
+        <h2>Booking Summary</h2>
+        <div class="booking-summary">
+            <p><strong>Ticket Type:</strong> Miracle Garden, Open Dated Tickets</p>
+            <p><strong>Tickets valid until:</strong> 30.04.2025</p>
+            <p><strong>Number of People:</strong> <span id="total-tickets">1 Adult</span></p>
+            <p><strong>Cancellation Policy:</strong> Tickets are non-refundable</p>
+        </div>
+        
+        <h2>Payment Details</h2>
+        <div class="payment-details">
+            <input type="text" placeholder="Card number" required>
+            <input type="text" placeholder="Expiration date (MM/YY)" required>
+            <input type="text" placeholder="CVC" required>
+            <button class="pay-button" onclick="processPayment()">Book now <span id="checkout-amount">100 AED</span></button>
+        </div>
+    </div>
+
+    <!-- Подключение библиотеки intl-tel-input для поля ввода телефона с флагами и кодами -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <script>
+        const prices = {
+            adult: 100,
+            child: 85,
+            infant: 0
+        };
+
+        function updateCount(type, delta) {
+            const countElement = document.getElementById(`${type}-count`);
+            let count = parseInt(countElement.value);
+            count = Math.max(0, count + delta); // prevent negative values
+            countElement.value = count;
+
+            const totalElement = document.getElementById(`${type}-total`);
+            const itemTotal = prices[type] * count;
+            totalElement.textContent = `${itemTotal} AED`;
+
+            updateTotal();
+        }
+
+        function updateTotal() {
+            const adultTotal = prices.adult * parseInt(document.getElementById('adult-count').value);
+            const childTotal = prices.child * parseInt(document.getElementById('child-count').value);
+            const infantTotal = prices.infant * parseInt(document.getElementById('infant-count').value);
+
+            const totalAmount = adultTotal + childTotal + infantTotal;
+            document.getElementById('total-amount').textContent = `${totalAmount} AED`;
+            document.getElementById('checkout-amount').textContent = `${totalAmount} AED`;
+            
+            document.getElementById('total-tickets').textContent = `${parseInt(document.getElementById('adult-count').value)} Adult(s), ${parseInt(document.getElementById('child-count').value)} Child(ren)`;
+        }
+
+        function showBookingForm() {
+            document.getElementById("ticketForm").style.display = "none";
+            document.getElementById("bookingForm").style.display = "block";
+        }
+
+        function processPayment() {
+            alert("Processing payment...");
+        }
+
+        // Инициализация поля ввода телефона с использованием intl-tel-input
+        document.addEventListener("DOMContentLoaded", function() {
+            const phoneInputField = document.getElementById("phone");
+            window.intlTelInput(phoneInputField, {
+                initialCountry: "ae", // Установим по умолчанию на UAE
+                preferredCountries: ["ae", "us", "uk", "in"], // Избранные страны (по необходимости)
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // Служебный скрипт для форматирования
+            });
+        });
+    </script>
+</body>
+</html>
